@@ -1,17 +1,23 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Postagem } from '../entities/postagem.entity';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult } from 'typeorm/browser';
+import { TemaService } from '../../tema/services/tema.service';
 
 @Injectable()
 export class PostagemService {
   constructor(
     @InjectRepository(Postagem)
     private postegemRepository: Repository<Postagem>, // injecao de dependencia
+    private temaService: TemaService
   ) {}
   async findAll(): Promise<Postagem[]> {
-    return await this.postegemRepository.find(); // select * from tb_postagem;
+    return await this.postegemRepository.find({ // select * from tb_postagem;
+        relations:{
+          tema: true
+        }
+    }); 
   }
 
   
@@ -20,6 +26,9 @@ export class PostagemService {
   const postagem = await this.postegemRepository.findOne({
     where: {
       id
+    },
+    relations:{tema:true
+
     }});
 
     if(!postagem)
@@ -28,8 +37,20 @@ export class PostagemService {
     return postagem;
   }
 
+  async findAllbyTitulo(titulo: string): Promise<Postagem[]>{
+    return await this.postegemRepository.find({
+      where:{
+        titulo: ILike(`%${titulo}%`)
+      },
+      relations:{
+        tema: true
+      }
+    })
+  }
+
   
   async create(postagem: Postagem): Promise<Postagem>{
+    await this.temaService.findById(postagem.tema.id)
     return await this.postegemRepository.save(postagem);
   }
   
@@ -42,6 +63,8 @@ export class PostagemService {
   async update(postagem: Postagem): Promise<Postagem>{
 
     await this.findBy(postagem.id)
+
+    await this.temaService.findById(postagem.tema.id)
 
     return await this.postegemRepository.save(postagem)
   }
