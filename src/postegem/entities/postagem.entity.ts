@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Tema } from '../../tema/entities/tema.entity';
+import { Usuario } from '../../usuario/entities/usuario.entity';
 
 @Entity({ name: 'tb_postagem' }) //Cria uma tabela com o nome tb_postagem
 export class Postagem {
@@ -24,10 +25,14 @@ export class Postagem {
   @UpdateDateColumn()
   data!: Date;
   
-  @ManyToOne(() => Tema, (tema) => tema.postagem,{
+  @ManyToOne(() => Tema, (tema) => tema.postagem,{ // varias postagem para um tema
     onDelete: "CASCADE"
   })
   tema!: Tema
+
+  @ManyToOne(() => Usuario, (usuario) => usuario.postagem, {
+    onDelete: "CASCADE"})
+    usuario!: Usuario
 
   
 }
