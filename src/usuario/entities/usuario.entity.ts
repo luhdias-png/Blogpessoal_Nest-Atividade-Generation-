@@ -9,17 +9,17 @@ export class Usuario {
     @PrimaryGeneratedColumn() 
     id!: number
  
-    @IsNotEmpty()
+    @IsNotEmpty({message: "O nome nao pode ficar vazio!"})
     @Column({length: 255, nullable: false}) 
     nome!: string
  
-    @IsEmail()
-    @IsNotEmpty()
+    @IsEmail({}, {message: "O email precisa ser valido!"})
+    @IsNotEmpty({message: "O Usuario nao pode ficar vazio!"})
     @Column({length: 255, nullable: false })
     usuario!: string
  
-    @MinLength(8)
-    @IsNotEmpty()
+    @MinLength(8,{message: "A senha precisar ter o minimo de 8 caracteres"})
+    @IsNotEmpty({message: "A senha é obrigatoria!"})
     @Column({length: 255, nullable: false }) 
     senha!: string
  
@@ -28,5 +28,6 @@ export class Usuario {
  
     @OneToMany(() => Postagem, (postagem) => postagem.usuario)
     postagem!: Postagem[]
+    
  
 }
